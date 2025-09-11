@@ -10,7 +10,7 @@ type UserRole = "student" | "employer" | null;
 
 interface AuthProps {
   onBack: () => void;
-  onAuthComplete: () => void;
+  onAuthComplete: (role: "student" | "employer") => void;
 }
 
 const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
@@ -33,69 +33,63 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     // Here you would integrate with Supabase auth
     console.log("Auth attempt:", { role: selectedRole, ...formData });
     // Simulate successful auth
-    onAuthComplete();
+    if (selectedRole) {
+      onAuthComplete(selectedRole);
+    }
   };
 
   if (!selectedRole) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+  <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full space-y-8"
+          className="max-w-md w-full space-y-8 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800"
         >
           <Button
             variant="ghost"
             onClick={onBack}
-            className="mb-4 p-2 hover:bg-muted"
+            className="mb-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-black dark:text-white"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
 
           <div className="text-center">
-            <h2 className="text-hero mb-2">Choose Your Role</h2>
-            <p className="text-body text-muted-foreground">
+            <h2 className="text-2xl font-bold mb-2 text-black dark:text-white">Choose Your Role</h2>
+            <p className="text-base text-gray-600 dark:text-gray-300">
               Select how you'll be using the platform
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4 mt-6">
             <motion.button
               onClick={() => handleRoleSelect("student")}
-              className="card-surface p-6 text-left interactive-card focus-ring"
+              className="p-6 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center gap-4"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
-                  <User className="h-6 w-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Student</h3>
-                  <p className="text-caption text-muted-foreground">
-                    Find your perfect internship
-                  </p>
-                </div>
+              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100 dark:bg-indigo-900">
+                <User className="h-6 w-6 text-black dark:text-indigo-300" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-black dark:text-white">Student</h3>
+                <p className="text-sm text-gray-600 dark:text-indigo-200">Find your perfect internship</p>
               </div>
             </motion.button>
 
             <motion.button
               onClick={() => handleRoleSelect("employer")}
-              className="card-surface p-6 text-left interactive-card focus-ring"
+              className="p-6 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center gap-4"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
-                  <Building className="h-6 w-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Employer</h3>
-                  <p className="text-caption text-muted-foreground">
-                    Discover talented interns
-                  </p>
-                </div>
+              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100 dark:bg-indigo-900">
+                <Building className="h-6 w-6 text-black dark:text-indigo-300" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-black dark:text-white">Employer</h3>
+                <p className="text-sm text-gray-600 dark:text-indigo-200">Discover talented interns</p>
               </div>
             </motion.button>
           </div>
@@ -105,34 +99,34 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+  <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full"
+        className="max-w-md w-full bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800"
       >
         <Button
           variant="ghost"
           onClick={() => setSelectedRole(null)}
-          className="mb-4 p-2 hover:bg-muted"
+          className="mb-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-black dark:text-white"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
 
-        <Card className="p-6">
+  <Card className="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-gray-100 dark:bg-indigo-900">
               {selectedRole === "student" ? (
-                <User className="h-6 w-6 text-accent" />
+                <User className="h-6 w-6 text-black dark:text-indigo-300" />
               ) : (
-                <Building className="h-6 w-6 text-accent" />
+                <Building className="h-6 w-6 text-black dark:text-indigo-300" />
               )}
             </div>
-            <h2 className="text-hero mb-2">
+            <h2 className="text-2xl font-bold mb-2 text-black dark:text-white">
               {isSignUp ? "Create Account" : "Sign In"}
             </h2>
-            <p className="text-caption text-muted-foreground">
+            <p className="text-sm text-gray-600 dark:text-indigo-200">
               {selectedRole === "student" ? "Student" : "Employer"} Account
             </p>
           </div>
@@ -206,7 +200,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
               </div>
             )}
 
-            <Button type="submit" className="w-full btn-hero">
+            <Button type="submit" className="w-full bg-black text-white dark:bg-indigo-700 dark:text-white rounded-lg py-2 mt-4 hover:bg-gray-900 dark:hover:bg-indigo-800 transition-colors">
               {isSignUp ? "Create Account" : "Sign In"}
             </Button>
           </form>
