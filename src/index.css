@@ -164,7 +164,7 @@
   
   /* Interactive States */
   .interactive-card {
-    @apply transition-all duration-[var(--transition-smooth)] hover:shadow-[var(--shadow-modal)] hover:-translate-y-1;
+    @apply transition-all duration-smooth hover:shadow-[var(--shadow-modal)] hover:-translate-y-1;
   }
   
   /* Focus States */
@@ -189,12 +189,12 @@
   .btn-hero {
     @apply bg-primary text-primary-foreground hover:bg-primary/90;
     @apply px-8 py-3 rounded-[var(--radius)] font-medium text-body;
-    @apply transition-all duration-[var(--transition-fast)] focus-ring;
+    @apply transition-all duration-fast focus-ring;
   }
   
   .btn-accent {
     @apply bg-accent text-accent-foreground hover:bg-accent/90;
     @apply px-6 py-2 rounded-[var(--radius-sm)] font-medium text-caption;
-    @apply transition-all duration-[var(--transition-fast)] focus-ring;
+    @apply transition-all duration-fast focus-ring;
   }
 }
