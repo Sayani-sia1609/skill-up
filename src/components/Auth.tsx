@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 
 type UserRole = "student" | "employer" | null;
 
-import StudentInfoForm from "./StudentInfoForm";
 
 interface AuthProps {
   onBack: () => void;
@@ -25,7 +24,6 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     name: "",
     company: ""
   });
-  const [showStudentInfoForm, setShowStudentInfoForm] = useState(false);
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
@@ -36,9 +34,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     // Here you would integrate with Supabase auth
     console.log("Auth attempt:", { role: selectedRole, ...formData });
     // Simulate successful auth
-    if (selectedRole === "student" && isSignUp) {
-      setShowStudentInfoForm(true);
-    } else if (selectedRole) {
+    if (selectedRole) {
       onAuthComplete(selectedRole);
     }
   };
@@ -106,9 +102,6 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     );
   }
 
-  if (showStudentInfoForm && isSignUp && selectedRole === "student") {
-    return <StudentInfoForm onSubmit={(info) => onAuthComplete("student", info)} />;
-  }
 
   return (
     <div

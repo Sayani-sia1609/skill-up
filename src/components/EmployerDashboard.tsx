@@ -38,6 +38,7 @@ const mockCandidates = [
   {
     id: 1,
     name: "Alice Chen",
+    jobPosition: "Frontend Developer",
     skills: ["React", "TypeScript", "Node.js"],
     gpa: 8,
     projects: 12,
@@ -51,6 +52,7 @@ const mockCandidates = [
   {
     id: 2,
     name: "Marcus Johnson",
+    jobPosition: "Data Scientist",
     skills: ["Python", "Machine Learning", "AWS"],
     gpa: 7.9,
     projects: 8,
@@ -64,6 +66,7 @@ const mockCandidates = [
   {
     id: 3,
     name: "Sarah Kim",
+    jobPosition: "Backend Engineer",
     skills: ["Java", "Spring", "Docker"],
     gpa: 3.9,
     projects: 15,
@@ -73,12 +76,43 @@ const mockCandidates = [
     strengths: ["Backend expertise", "System design", "Mentoring experience"],
     weaknesses: ["Frontend skills could improve"],
     skillGap: 10
+  },
+  {
+    id: 4,
+    name: "Priya Singh",
+    jobPosition: "UI/UX Designer",
+    skills: ["Figma", "Sketch", "Adobe XD"],
+    gpa: 8.5,
+    projects: 10,
+    experience: 2,
+    matchPercent: 90,
+    cvScore: 88,
+    strengths: ["Creative design", "User research", "Prototyping"],
+    weaknesses: ["Limited coding experience"],
+    skillGap: 12
+  },
+  {
+    id: 5,
+    name: "David Lee",
+    jobPosition: "DevOps Engineer",
+    skills: ["AWS", "Docker", "Kubernetes"],
+    gpa: 7.8,
+    projects: 14,
+    experience: 4,
+    matchPercent: 87,
+    cvScore: 82,
+    strengths: ["Cloud infrastructure", "Automation", "CI/CD pipelines"],
+    weaknesses: ["Needs more security training"],
+    skillGap: 18
   }
 ];
 
 const mockShortlisted = [
   mockCandidates[0],
-  mockCandidates[2]
+  mockCandidates[3],
+  mockCandidates[2],
+  mockCandidates[4],
+  mockCandidates[1]
 ];
 
 const EmployerDashboard = ({ onLogout, darkMode, setDarkMode }: EmployerDashboardProps) => {
@@ -128,7 +162,7 @@ const EmployerDashboard = ({ onLogout, darkMode, setDarkMode }: EmployerDashboar
 
         <div className="flex justify-between items-center">
           <Button 
-            variant="outline" Badge
+            variant="outline"
             size="sm"
             onClick={() => setSelectedCandidate(candidate)}
           >
@@ -231,10 +265,35 @@ const EmployerDashboard = ({ onLogout, darkMode, setDarkMode }: EmployerDashboar
                 <CardDescription>Your top candidate picks</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {mockShortlisted.map((candidate) => (
-                    <CandidateCard key={candidate.id} candidate={candidate} isShortlisted />
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="py-2 px-4">Rank</th>
+                        <th className="py-2 px-4">Name</th>
+                        <th className="py-2 px-4">Job Position</th>
+                        <th className="py-2 px-4">Match %</th>
+                        <th className="py-2 px-4">Projects</th>
+                        <th className="py-2 px-4">Experience (yrs)</th>
+                        <th className="py-2 px-4">CV Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mockShortlisted
+                        .sort((a, b) => b.matchPercent - a.matchPercent)
+                        .map((candidate, idx) => (
+                          <tr key={candidate.id} className="border-b hover:bg-muted/20">
+                            <td className="py-2 px-4 font-bold">{idx + 1}</td>
+                            <td className="py-2 px-4">{candidate.name}</td>
+                            <td className="py-2 px-4">{candidate.jobPosition}</td>
+                            <td className="py-2 px-4">{candidate.matchPercent}%</td>
+                            <td className="py-2 px-4">{candidate.projects}</td>
+                            <td className="py-2 px-4">{candidate.experience}</td>
+                            <td className="py-2 px-4">{candidate.cvScore}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>

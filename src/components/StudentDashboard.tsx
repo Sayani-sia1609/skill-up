@@ -35,15 +35,26 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
   };
   const [profileComplete, setProfileComplete] = useState(75);
   const [hasResume, setHasResume] = useState(false);
-  const [skills, setSkills] = useState(["React", "TypeScript", "Python", "CSS", "JavaScript"]);
-  const [newSkill, setNewSkill] = useState("");
+  // My skills (shorter list)
+  const mySkills = [
+    "Python",
+    "React",
+    "UI/UX Design",
+    "SQL"
+  ];
+  // In-demand market skills
+  const inDemandSkills = [
+    "TypeScript",
+    "JavaScript",
+    "Data Analysis",
+    "Cloud Computing",
+    "Machine Learning",
+    "Cybersecurity"
+  ];
   const [domains, setDomains] = useState(["Frontend Development", "UI/UX Design", "Machine Learning"]);
   const [newDomain, setNewDomain] = useState("");
 
-  // Remove skill handler
-  const handleRemoveSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
-  };
+  // Removed skill add/remove handlers
 
   // Example user details
   const user = {
@@ -94,14 +105,7 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
     if (input) input.click();
   };
 
-  // Skill add handler
-  const handleAddSkill = () => {
-    const skill = newSkill.trim();
-    if (skill && !skills.includes(skill)) {
-      setSkills([...skills, skill]);
-      setNewSkill("");
-    }
-  };
+  // Removed skill add handler
 
   // Domain handlers
   const handleAddDomain = () => {
@@ -350,37 +354,23 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
             <h3 className="font-medium mb-4">Your Profile</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-caption font-medium mb-2">Skills</h4>
+                <h4 className="text-caption font-medium mb-2">My Skills</h4>
                 <div className="flex flex-wrap gap-2 mb-2">
-                  {skills.map((skill, idx) => (
-                    <Badge key={skill} variant="secondary" className="flex items-center gap-1">
+                  {mySkills.map((skill) => (
+                    <Badge key={skill} variant="secondary">
                       {skill}
-                      <button
-                        type="button"
-                        className="ml-1 text-xs text-red-500 hover:text-red-700"
-                        onClick={() => handleRemoveSkill(skill)}
-                        aria-label={`Remove ${skill}`}
-                      >✕</button>
                     </Badge>
                   ))}
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    value={newSkill}
-                    onChange={e => setNewSkill(e.target.value)}
-                    placeholder="Add a skill"
-                    className="border rounded px-2 py-1 text-sm"
-                  />
-                  <Button type="button" size="sm" onClick={handleAddSkill} disabled={!newSkill.trim()}>
-                    Add
-                  </Button>
-                </div>
               </div>
               <div>
-                <h4 className="text-caption font-medium mb-2">Bio</h4>
+                <h4 className="text-caption font-medium mb-2">In-Demand Skills</h4>
                 <div className="mb-2 text-muted-foreground">
-                  {studentInfo.bio || <span className="italic">No bio provided.</span>}
+                  <ul className="list-disc pl-4">
+                    {inDemandSkills.map((skill) => (
+                      <li key={skill}>{skill}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>

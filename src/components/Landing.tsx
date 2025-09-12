@@ -20,7 +20,7 @@ const Landing = ({ onGetStarted }: LandingProps) => {
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
+            <img src="/logo.jpg" alt="Logo" className="h-8 w-8" />
             <span className="font-bold text-xl text-foreground">SkillUp</span>
           </div>
           {/* Buttons */}
