@@ -39,7 +39,7 @@ const mockCandidates = [
     id: 1,
     name: "Alice Chen",
     skills: ["React", "TypeScript", "Node.js"],
-    gpa: 3.8,
+    gpa: 8,
     projects: 12,
     experience: 2,
     matchPercent: 92,
@@ -52,7 +52,7 @@ const mockCandidates = [
     id: 2,
     name: "Marcus Johnson",
     skills: ["Python", "Machine Learning", "AWS"],
-    gpa: 3.6,
+    gpa: 7.9,
     projects: 8,
     experience: 1,
     matchPercent: 88,
@@ -398,7 +398,7 @@ const EmployerDashboard = ({ onLogout, darkMode, setDarkMode }: EmployerDashboar
                     <Input 
                       placeholder="Type your message..."
                       value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}on>
+                       onChange={(e) => setMessageInput(e.target.value)}
                       className="flex-1"
                     />
                     <Button size="sm" className="btn-accent">

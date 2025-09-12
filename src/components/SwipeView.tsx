@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Heart, X, Info, MapPin, Calendar, DollarSign, ArrowLeft } from "lucide-react";
+import { FileText, ClipboardList, Bell } from "lucide-react";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent, MenubarItem } from "@/components/ui/menubar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -140,7 +143,44 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
   if (!currentJob) return null;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-row">
+      {/* Dashboard Sidebar - always visible on the left */}
+      <aside className="w-80 h-full bg-card border-r border-border p-6 flex flex-col gap-8">
+  <h2 className="font-semibold text-lg mb-6">Dashboard</h2>
+        {/* Resume Section */}
+        <section>
+          <h3 className="font-medium mb-2 flex items-center gap-2"><FileText className="h-5 w-5 text-muted-foreground" /> Resume</h3>
+          <div className="bg-muted rounded p-3 mb-2">Upload or update your resume to improve job matches.</div>
+          <Button variant="outline" className="w-full">Upload Resume</Button>
+        </section>
+        {/* Previous Applications Section */}
+        <section>
+          <h3 className="font-medium mb-2 flex items-center gap-2"><ClipboardList className="h-5 w-5 text-muted-foreground" /> Previous Applications</h3>
+          <ul className="space-y-2">
+            <li className="bg-muted rounded px-3 py-2 flex justify-between items-center">
+              <span>Frontend Developer Intern</span>
+              <span className="text-xs text-muted-foreground">TechCorp</span>
+            </li>
+            <li className="bg-muted rounded px-3 py-2 flex justify-between items-center">
+              <span>Data Science Intern</span>
+              <span className="text-xs text-muted-foreground">DataFlow</span>
+            </li>
+            <li className="bg-muted rounded px-3 py-2 flex justify-between items-center">
+              <span>UX Design Intern</span>
+              <span className="text-xs text-muted-foreground">DesignStudio</span>
+            </li>
+          </ul>
+        </section>
+        {/* Notifications Section */}
+        <section>
+          <h3 className="font-medium mb-2 flex items-center gap-2"><Bell className="h-5 w-5 text-muted-foreground" /> Notifications</h3>
+          <ul className="space-y-2">
+            <li className="bg-accent/10 rounded px-3 py-2 text-accent">Interview scheduled for Frontend Developer Intern</li>
+            <li className="bg-accent/10 rounded px-3 py-2 text-accent">New offer from DataFlow</li>
+            <li className="bg-accent/10 rounded px-3 py-2 text-accent">Profile viewed by DesignStudio</li>
+          </ul>
+        </section>
+      </aside>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <Button variant="ghost" onClick={onBack} className="p-2">
@@ -237,25 +277,25 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
               </div>
             </div>
           )}
+
+          {/* Swipe Indicators */}
+          <motion.div
+            className="absolute left-8 top-1/2 -translate-y-1/2 w-16 h-16 bg-destructive/20 rounded-full flex items-center justify-center border-2 border-destructive"
+            style={{ opacity: useTransform(x, [-100, 0], [1, 0]) }}
+          >
+            <X className="h-8 w-8 text-destructive" />
+          </motion.div>
+
+          <motion.div
+            className="absolute right-8 top-1/2 -translate-y-1/2 w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-green-500"
+            style={{ opacity: useTransform(x, [0, 100], [0, 1]) }}
+          >
+            <Heart className="h-8 w-8 text-green-500" />
+          </motion.div>
         </div>
-
-        {/* Swipe Indicators */}
-        <motion.div
-          className="absolute left-8 top-1/2 -translate-y-1/2 w-16 h-16 bg-destructive/20 rounded-full flex items-center justify-center border-2 border-destructive"
-          style={{ opacity: useTransform(x, [-100, 0], [1, 0]) }}
-        >
-          <X className="h-8 w-8 text-destructive" />
-        </motion.div>
-
-        <motion.div
-          className="absolute right-8 top-1/2 -translate-y-1/2 w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-green-500"
-          style={{ opacity: useTransform(x, [0, 100], [0, 1]) }}
-        >
-          <Heart className="h-8 w-8 text-green-500" />
-        </motion.div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - now below the swipe area */}
       <div className="p-4 border-t border-border">
         <div className="flex justify-center space-x-6">
           <Button

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Upload, Search, FileText, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { Pencil, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +16,19 @@ interface StudentDashboardProps {
 }
 
 const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }: StudentDashboardProps) => {
+  const navigate = typeof useNavigate === 'function' ? useNavigate() : null;
+  // ...avatar state declared below...
+  const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Alex+Johnson&background=06B6D4&color=fff");
+  // Helper to check if avatar is default
+  const isDefaultAvatar = avatar === "https://ui-avatars.com/api/?name=Alex+Johnson&background=06B6D4&color=fff";
+  // Handler for back button
+  const handleBack = () => {
+    if (navigate) {
+      navigate(-1);
+    } else {
+      window.history.back();
+    }
+  };
   const [profileComplete, setProfileComplete] = useState(75);
   const [hasResume, setHasResume] = useState(false);
   const [skills, setSkills] = useState(["React", "TypeScript", "Python", "CSS", "JavaScript"]);
@@ -21,35 +36,22 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
   const [domains, setDomains] = useState(["Frontend Development", "UI/UX Design", "Machine Learning"]);
   const [newDomain, setNewDomain] = useState("");
 
-  const handleAddDomain = () => {
-    if (newDomain.trim() && !domains.includes(newDomain.trim())) {
-      setDomains([...domains, newDomain.trim()]);
-      setNewDomain("");
-    }
-  };
-
-  const handleRemoveDomain = (domain: string) => {
-    setDomains(domains.filter(d => d !== domain));
-  };
-
-  const handleResumeUpload = () => {
-    // Simulate resume upload
-    setHasResume(true);
-    setProfileComplete(90);
+  // Remove skill handler
+  const handleRemoveSkill = (skillToRemove: string) => {
+    setSkills(skills.filter(skill => skill !== skillToRemove));
   };
 
   // Example user details
-  const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Alex+Johnson&background=06B6D4&color=fff");
   const user = {
     name: "Alex Johnson",
     email: "alex.johnson@email.com",
-    avatar,
+    avatar: avatar,
     university: "IIT Bombay",
     major: "Computer Science",
     year: "3rd Year",
     applications: 12,
     interviews: 3,
-    offers: 1
+    offers: 1,
   };
 
   // Experience state
@@ -59,149 +61,107 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
   ]);
   const [newExp, setNewExp] = useState({ role: "", company: "", year: "" });
 
-  const handleAddExperience = () => {
-    if (newExp.role && newExp.company && newExp.year) {
-      setExperiences([...experiences, newExp]);
-      setNewExp({ role: "", company: "", year: "" });
-    }
-  };
-
-  const handleRemoveExperience = (idx: number) => {
-    setExperiences(experiences.filter((_, i) => i !== idx));
-  };
-
-  // Avatar upload
+  // Handler for avatar upload
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onloadend = () => {
         setAvatar(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  // Handler for resume upload
+  const handleResumeUpload = () => {
+    setHasResume(true);
+    setProfileComplete(100); // Always set to 100% after resume upload
+  };
+
+  // Skill add handler
   const handleAddSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
+    const skill = newSkill.trim();
+    if (skill && !skills.includes(skill)) {
+      setSkills([...skills, skill]);
       setNewSkill("");
     }
   };
 
-  const handleRemoveSkill = (skill: string) => {
-    setSkills(skills.filter(s => s !== skill));
+  // Domain handlers
+  const handleAddDomain = () => {
+    const domain = newDomain.trim();
+    if (domain && !domains.includes(domain)) {
+      setDomains([...domains, domain]);
+      setNewDomain("");
+    }
+  };
+  const handleRemoveDomain = (domain: string) => {
+    setDomains(domains.filter(d => d !== domain));
+  };
+
+  // Experience handlers
+  const handleAddExperience = () => {
+    if (newExp.role && newExp.company && newExp.year) {
+      setExperiences([...experiences, newExp]);
+      setNewExp({ role: "", company: "", year: "" });
+    }
+  };
+  const handleRemoveExperience = (idx: number) => {
+    setExperiences(experiences.filter((_, i) => i !== idx));
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
-              <User className="h-5 w-5 text-accent" />
-            </div>
-            <h1 className="font-medium">Dashboard</h1>
+    <div className="max-w-4xl mx-auto px-4 py-8 flex gap-8 relative">
+      {/* Back Button - top left corner, icon only */}
+      <div style={{ position: 'fixed', top: 24, left: 24, zIndex: 50 }}>
+        <Button variant="ghost" size="icon" onClick={handleBack} aria-label="Back">
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+      </div>
+      {/* Mini Profile Sidebar */}
+      <aside className="w-72 shrink-0 hidden md:block">
+        <Card className="p-6 flex flex-col items-center text-center">
+          <label htmlFor="avatar-upload" className="cursor-pointer relative">
+            <img src={user.avatar} alt="Avatar" className="w-20 h-20 rounded-full mb-3 border-2 border-card object-cover" />
+            {isDefaultAvatar && (
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-20 h-20">
+                <Pencil className="w-6 h-6 text-muted-foreground bg-background/80 rounded-full p-1" />
+              </span>
+            )}
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
+            <span className="block text-xs text-muted-foreground mb-2">Change Picture</span>
+          </label>
+          <h3 className="font-semibold text-lg mb-1">{user.name}</h3>
+          <p className="text-caption text-muted-foreground mb-2">{user.email}</p>
+          <div className="mb-2">
+            <span className="text-caption font-medium">{user.university}</span>
+            <span className="block text-small text-muted-foreground">{user.major}, {user.year}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
-              <Settings className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onLogout}>
-              <LogOut className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setDarkMode(!darkMode)}
-              className="text-foreground"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
+          <div className="flex justify-center gap-4 mt-2">
+            <div className="text-center">
+              <span className="font-bold text-lg text-foreground">{user.applications}</span>
+              <div className="text-small text-muted-foreground">Applications</div>
+            </div>
+            <div className="text-center">
+              <span className="font-bold text-lg text-foreground">{user.interviews}</span>
+              <div className="text-small text-muted-foreground">Interviews</div>
+            </div>
+            <div className="text-center">
+              <span className="font-bold text-lg text-foreground">{user.offers}</span>
+              <div className="text-small text-muted-foreground">Offers</div>
+            </div>
           </div>
-        </div>
-      </header>
-
-      <div className="max-w-4xl mx-auto px-4 py-8 flex gap-8">
-        {/* Mini Profile Sidebar */}
-        <aside className="w-72 shrink-0 hidden md:block">
-          <Card className="p-6 flex flex-col items-center text-center">
-            <label htmlFor="avatar-upload" className="cursor-pointer">
-              <img src={user.avatar} alt="Avatar" className="w-20 h-20 rounded-full mb-3 border-2 border-accent object-cover" />
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarUpload}
-              />
-              <span className="block text-xs text-muted-foreground mb-2">Change Picture</span>
-            </label>
-            <h3 className="font-semibold text-lg mb-1">{user.name}</h3>
-            <p className="text-caption text-muted-foreground mb-2">{user.email}</p>
-            <div className="mb-2">
-              <span className="text-caption font-medium">{user.university}</span>
-              <span className="block text-small text-muted-foreground">{user.major}, {user.year}</span>
-            </div>
-            <div className="flex justify-center gap-4 mt-2">
-              <div className="text-center">
-                <span className="font-bold text-lg">{user.applications}</span>
-                <div className="text-small text-muted-foreground">Applications</div>
-              </div>
-              <div className="text-center">
-                <span className="font-bold text-lg">{user.interviews}</span>
-                <div className="text-small text-muted-foreground">Interviews</div>
-              </div>
-              <div className="text-center">
-                <span className="font-bold text-lg">{user.offers}</span>
-                <div className="text-small text-muted-foreground">Offers</div>
-              </div>
-            </div>
-            <div className="mt-6 w-full">
-              <h4 className="text-caption font-medium mb-2">Experience</h4>
-              <ul className="space-y-2 mb-2">
-                {experiences.map((exp, idx) => (
-                  <li key={idx} className="flex justify-between items-center text-left bg-muted rounded px-2 py-1">
-                    <span className="text-sm">{exp.role} <span className="text-muted-foreground">@ {exp.company} ({exp.year})</span></span>
-                    <button
-                      type="button"
-                      className="ml-2 text-xs text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemoveExperience(idx)}
-                      aria-label={`Remove experience ${exp.role}`}
-                    >×</button>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex gap-1 mt-2">
-                <input
-                  type="text"
-                  value={newExp.role}
-                  onChange={e => setNewExp({ ...newExp, role: e.target.value })}
-                  placeholder="Role"
-                  className="border border-border rounded px-2 py-1 text-xs focus-ring w-1/3"
-                />
-                <input
-                  type="text"
-                  value={newExp.company}
-                  onChange={e => setNewExp({ ...newExp, company: e.target.value })}
-                  placeholder="Company"
-                  className="border border-border rounded px-2 py-1 text-xs focus-ring w-1/3"
-                />
-                <input
-                  type="text"
-                  value={newExp.year}
-                  onChange={e => setNewExp({ ...newExp, year: e.target.value })}
-                  placeholder="Year"
-                  className="border border-border rounded px-2 py-1 text-xs focus-ring w-1/4"
-                />
-                <Button size="sm" variant="outline" onClick={handleAddExperience} className="text-xs">Add</Button>
-              </div>
-            </div>
-          </Card>
-        </aside>
-        <div className="flex-1 space-y-6">
+          {/* Experience section removed from sidebar. Only in main profile card. */}
+        </Card>
+      </aside>
+      <div className="flex-1 space-y-6">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -258,7 +218,7 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
             <p className="text-caption text-muted-foreground mb-4">
               Discover new internship opportunities matched to your profile
             </p>
-            <Button className="w-full btn-accent">
+            <Button className="w-full bg-accent text-accent-foreground">
               Start Swiping
             </Button>
           </Card>
@@ -303,14 +263,12 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
                   <div className="w-8 h-8 bg-green-500/10 rounded-full flex items-center justify-center">
                     <span className="text-small text-green-600">92%</span>
                   </div>
-                  <div>
-                    <p className="text-caption font-medium">Frontend Developer Intern</p>
+                  <div className="flex items-center space-x-2">
                     <p className="text-small text-muted-foreground">TechCorp • Liked</p>
                   </div>
                 </div>
                 <span className="text-small text-muted-foreground">2h ago</span>
               </div>
-              
               <div className="flex items-center justify-between py-2 border-b border-border last:border-b-0">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
@@ -323,7 +281,6 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
                 </div>
                 <span className="text-small text-muted-foreground">1d ago</span>
               </div>
-              
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-green-500/10 rounded-full flex items-center justify-center">
@@ -449,7 +406,6 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
             </div>
           </Card>
         </motion.div>
-        </div>
       </div>
     </div>
   );

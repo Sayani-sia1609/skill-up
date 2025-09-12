@@ -55,28 +55,28 @@ export const EmployerSwipeDeck = () => {
               if (info.offset.x > 100) handleSwipe("right");
               else if (info.offset.x < -100) handleSwipe("left");
             }}
-            className="bg-white rounded-lg shadow-md p-6 w-full max-w-md mb-6 select-none"
+            className="bg-card rounded-lg shadow-md p-6 w-full max-w-md mb-6 select-none"
           >
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-semibold text-gray-900">{currentStudent.name}</h2>
-              <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">{currentStudent.match}% Match</span>
+              <h2 className="text-xl font-semibold text-foreground">{currentStudent.name}</h2>
+              <span className="text-sm bg-accent/10 text-accent px-2 py-1 rounded-full font-medium">{currentStudent.match}% Match</span>
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               {currentStudent.skills.map((skill) => (
-                <span key={skill} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                <span key={skill} className="bg-muted text-muted-foreground px-3 py-1 rounded-full text-xs font-medium">
                   {skill}
                 </span>
               ))}
             </div>
-            <p className="text-gray-600 text-sm mb-4">{currentStudent.summary}</p>
-            <Button className="w-full bg-blue-500 text-white rounded-lg mt-2 hover:bg-blue-600 transition">View Full Profile</Button>
+            <p className="text-muted-foreground text-sm mb-4">{currentStudent.summary}</p>
+            <Button className="w-full bg-accent text-accent-foreground rounded-lg mt-2 hover:bg-accent/80 transition">View Full Profile</Button>
           </motion.div>
         )}
       </AnimatePresence>
       {!currentStudent && (
         <div className="text-center mt-10">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">No more students to review.</h3>
-          <p className="text-gray-500">You have shortlisted {shortlisted.length} students.</p>
+          <h3 className="text-lg font-semibold text-muted-foreground mb-2">No more students to review.</h3>
+          <p className="text-muted-foreground">You have shortlisted {shortlisted.length} students.</p>
         </div>
       )}
     </div>
