@@ -8,9 +8,11 @@ import { Card } from "@/components/ui/card";
 
 type UserRole = "student" | "employer" | null;
 
+import StudentInfoForm from "./StudentInfoForm";
+
 interface AuthProps {
   onBack: () => void;
-  onAuthComplete: (role: "student" | "employer") => void;
+  onAuthComplete: (role: "student" | "employer", studentInfo?: any) => void;
 }
 
 const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
@@ -23,6 +25,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     name: "",
     company: ""
   });
+  const [showStudentInfoForm, setShowStudentInfoForm] = useState(false);
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
@@ -33,14 +36,19 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     // Here you would integrate with Supabase auth
     console.log("Auth attempt:", { role: selectedRole, ...formData });
     // Simulate successful auth
-    if (selectedRole) {
+    if (selectedRole === "student" && isSignUp) {
+      setShowStudentInfoForm(true);
+    } else if (selectedRole) {
       onAuthComplete(selectedRole);
     }
   };
 
   if (!selectedRole) {
     return (
-  <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4">
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 50%, #a1c4fd 100%)" }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -98,8 +106,15 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     );
   }
 
+  if (showStudentInfoForm && isSignUp && selectedRole === "student") {
+    return <StudentInfoForm onSubmit={(info) => onAuthComplete("student", info)} />;
+  }
+
   return (
-  <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4">
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 50%, #a1c4fd 100%)" }}
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -114,7 +129,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
           Back
         </Button>
 
-  <Card className="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+        <Card className="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-gray-100 dark:bg-indigo-900">
               {selectedRole === "student" ? (
@@ -134,7 +149,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div>
-                <Label htmlFor="name">
+                <Label htmlFor="name" className="text-white">
                   {selectedRole === "student" ? "Full Name" : "Contact Name"}
                 </Label>
                 <Input
@@ -150,7 +165,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
 
             {isSignUp && selectedRole === "employer" && (
               <div>
-                <Label htmlFor="company">Company Name</Label>
+                <Label htmlFor="company" className="text-white">Company Name</Label>
                 <Input
                   id="company"
                   type="text"
@@ -163,7 +178,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
             )}
 
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-white">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -175,7 +190,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-white">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -188,7 +203,7 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
 
             {isSignUp && (
               <div>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"

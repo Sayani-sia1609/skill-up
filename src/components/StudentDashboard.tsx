@@ -1,4 +1,5 @@
 import { useState } from "react";
+import StudentInfoForm from "./StudentInfoForm";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Upload, Search, FileText, Settings, LogOut, Sun, Moon } from "lucide-react";
@@ -17,13 +18,16 @@ interface StudentDashboardProps {
 
 const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }: StudentDashboardProps) => {
   const navigate = typeof useNavigate === 'function' ? useNavigate() : null;
-  // ...avatar state declared below...
+  // Student info state
+  const [studentInfo, setStudentInfo] = useState(null);
   const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Alex+Johnson&background=06B6D4&color=fff");
   // Helper to check if avatar is default
   const isDefaultAvatar = avatar === "https://ui-avatars.com/api/?name=Alex+Johnson&background=06B6D4&color=fff";
   // Handler for back button
   const handleBack = () => {
-    if (navigate) {
+    if (typeof onLogout === 'function') {
+      onLogout();
+    } else if (navigate) {
       navigate(-1);
     } else {
       window.history.back();
@@ -43,12 +47,12 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
 
   // Example user details
   const user = {
-    name: "Alex Johnson",
-    email: "alex.johnson@email.com",
+    name: studentInfo?.name || "Student",
+    email: studentInfo?.email || "",
     avatar: avatar,
-    university: "IIT Bombay",
-    major: "Computer Science",
-    year: "3rd Year",
+    university: studentInfo?.institute || "",
+    major: "",
+    year: "",
     applications: 12,
     interviews: 3,
     offers: 1,
@@ -74,9 +78,20 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
   };
 
   // Handler for resume upload
-  const handleResumeUpload = () => {
-    setHasResume(true);
-    setProfileComplete(100); // Always set to 100% after resume upload
+  // Handler for resume upload
+  // Handler for resume upload
+  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === "application/pdf") {
+      setHasResume(true);
+      setProfileComplete(100); // Always set to 100% after resume upload
+    }
+  };
+
+  // Trigger file input click when button is pressed
+  const triggerResumeInput = () => {
+    const input = document.getElementById("resume-upload") as HTMLInputElement;
+    if (input) input.click();
   };
 
   // Skill add handler
@@ -111,12 +126,33 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
     setExperiences(experiences.filter((_, i) => i !== idx));
   };
 
+  // Show info form if not filled
+  if (!studentInfo) {
+    return <StudentInfoForm onSubmit={setStudentInfo} />;
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 flex gap-8 relative">
       {/* Back Button - top left corner, icon only */}
       <div style={{ position: 'fixed', top: 24, left: 24, zIndex: 50 }}>
         <Button variant="ghost" size="icon" onClick={handleBack} aria-label="Back">
           <ArrowLeft className="w-5 h-5" />
+        </Button>
+      </div>
+      {/* Theme Toggle Button - top right corner, same as Landing page */}
+      <div style={{ position: 'fixed', top: 24, right: 24, zIndex: 50 }}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Toggle theme"
+          onClick={() => setDarkMode(!darkMode)}
+          className="text-foreground"
+        >
+          {darkMode ? (
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+          ) : (
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><path d="M12 1v2m0 18v2m9-9h-2M5 12H3m15.36 6.36l-1.42-1.42M6.36 6.36L4.94 4.94m12.02 0l-1.42 1.42M6.36 17.64l-1.42 1.42" /></svg>
+          )}
         </Button>
       </div>
       {/* Mini Profile Sidebar */}
@@ -141,8 +177,8 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
           <h3 className="font-semibold text-lg mb-1">{user.name}</h3>
           <p className="text-caption text-muted-foreground mb-2">{user.email}</p>
           <div className="mb-2">
-            <span className="text-caption font-medium">{user.university}</span>
-            <span className="block text-small text-muted-foreground">{user.major}, {user.year}</span>
+            <span className="text-caption font-medium">{studentInfo.institute}</span>
+            <span className="block text-small text-muted-foreground">{studentInfo.educationLevel}, Grade: {studentInfo.grade}</span>
           </div>
           <div className="flex justify-center gap-4 mt-2">
             <div className="text-center">
@@ -238,10 +274,17 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
                 : "Upload your resume to get better matches"
               }
             </p>
+            <input
+              id="resume-upload"
+              type="file"
+              accept="application/pdf"
+              className="hidden"
+              onChange={handleResumeUpload}
+            />
             <Button 
               variant="outline" 
               className="w-full focus-ring"
-              onClick={handleResumeUpload}
+              onClick={triggerResumeInput}
             >
               <Upload className="h-4 w-4 mr-2" />
               {hasResume ? "Update Resume" : "Upload Resume"}
@@ -309,17 +352,15 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
               <div>
                 <h4 className="text-caption font-medium mb-2">Skills</h4>
                 <div className="flex flex-wrap gap-2 mb-2">
-                  {skills.map(skill => (
+                  {skills.map((skill, idx) => (
                     <Badge key={skill} variant="secondary" className="flex items-center gap-1">
                       {skill}
                       <button
                         type="button"
-                        className="ml-1 text-xs text-muted-foreground hover:text-destructive"
+                        className="ml-1 text-xs text-red-500 hover:text-red-700"
                         onClick={() => handleRemoveSkill(skill)}
                         aria-label={`Remove ${skill}`}
-                      >
-                        ×
-                      </button>
+                      >✕</button>
                     </Badge>
                   ))}
                 </div>
@@ -328,80 +369,30 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
                     type="text"
                     value={newSkill}
                     onChange={e => setNewSkill(e.target.value)}
-                    placeholder="Add a skill..."
-                    className="border border-border rounded px-2 py-1 text-sm focus-ring"
+                    placeholder="Add a skill"
+                    className="border rounded px-2 py-1 text-sm"
                   />
-                  <Button size="sm" variant="outline" onClick={handleAddSkill} className="text-xs">Add</Button>
+                  <Button type="button" size="sm" onClick={handleAddSkill} disabled={!newSkill.trim()}>
+                    Add
+                  </Button>
                 </div>
               </div>
               <div>
-                <h4 className="text-caption font-medium mb-2">Domains</h4>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {domains.map(domain => (
-                    <Badge key={domain} variant="outline" className="flex items-center gap-1">
-                      {domain}
-                      <button
-                        type="button"
-                        className="ml-1 text-xs text-muted-foreground hover:text-destructive"
-                        onClick={() => handleRemoveDomain(domain)}
-                        aria-label={`Remove ${domain}`}
-                      >
-                        ×
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    value={newDomain}
-                    onChange={e => setNewDomain(e.target.value)}
-                    placeholder="Add a domain..."
-                    className="border border-border rounded px-2 py-1 text-sm focus-ring"
-                  />
-                  <Button size="sm" variant="outline" onClick={handleAddDomain} className="text-xs">Add</Button>
+                <h4 className="text-caption font-medium mb-2">Bio</h4>
+                <div className="mb-2 text-muted-foreground">
+                  {studentInfo.bio || <span className="italic">No bio provided.</span>}
                 </div>
               </div>
             </div>
-            {/* Experience Section Below Skills & Domains */}
             <div className="mt-8">
-              <h4 className="text-caption font-medium mb-2">Experience</h4>
-              <ul className="space-y-2 mb-2">
-                {experiences.map((exp, idx) => (
-                  <li key={idx} className="flex justify-between items-center text-left bg-muted rounded px-2 py-1">
-                    <span className="text-sm">{exp.role} <span className="text-muted-foreground">@ {exp.company} ({exp.year})</span></span>
-                    <button
-                      type="button"
-                      className="ml-2 text-xs text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemoveExperience(idx)}
-                      aria-label={`Remove experience ${exp.role}`}
-                    >×</button>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex gap-1 mt-2">
-                <input
-                  type="text"
-                  value={newExp.role}
-                  onChange={e => setNewExp({ ...newExp, role: e.target.value })}
-                  placeholder="Role"
-                  className="border border-border rounded px-2 py-1 text-xs focus-ring w-1/3"
-                />
-                <input
-                  type="text"
-                  value={newExp.company}
-                  onChange={e => setNewExp({ ...newExp, company: e.target.value })}
-                  placeholder="Company"
-                  className="border border-border rounded px-2 py-1 text-xs focus-ring w-1/3"
-                />
-                <input
-                  type="text"
-                  value={newExp.year}
-                  onChange={e => setNewExp({ ...newExp, year: e.target.value })}
-                  placeholder="Year"
-                  className="border border-border rounded px-2 py-1 text-xs focus-ring w-1/4"
-                />
-                <Button size="sm" variant="outline" onClick={handleAddExperience} className="text-xs">Add</Button>
+              <h4 className="text-caption font-medium mb-2">Avatar</h4>
+              <div className="flex gap-4 items-center">
+                {studentInfo.avatar && (
+                  <img src={studentInfo.avatar} alt="Avatar" className="w-16 h-16 rounded-full border" />
+                )}
+                {studentInfo.customAvatar && (
+                  <img src={URL.createObjectURL(studentInfo.customAvatar)} alt="Custom Avatar" className="w-16 h-16 rounded-full border" />
+                )}
               </div>
             </div>
           </Card>

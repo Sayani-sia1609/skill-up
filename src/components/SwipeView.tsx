@@ -61,6 +61,54 @@ const mockJobs: Job[] = [
     skills: ["Figma", "User Research", "Prototyping", "Design Systems"],
     matchPercentage: 85,
     matchReason: "Strong match: Design skills, Figma. Missing: User research experience"
+  },
+  {
+    id: "4",
+    title: "Backend Developer Intern",
+    company: "FinTechX",
+    location: "Bangalore, India",
+    duration: "6 months",
+    compensation: "$2,200/month",
+    description: "Work on scalable backend systems using Node.js and MongoDB. Collaborate with product teams to deliver robust APIs.",
+    skills: ["Node.js", "MongoDB", "Express", "REST APIs"],
+    matchPercentage: 88,
+    matchReason: "Strong match: Node.js, REST APIs. Missing: Docker experience"
+  },
+  {
+    id: "5",
+    title: "Mobile App Developer Intern",
+    company: "Appify",
+    location: "Remote",
+    duration: "4 months",
+    compensation: "$2,000/month",
+    description: "Help build cross-platform mobile apps using React Native. Work closely with designers and QA.",
+    skills: ["React Native", "JavaScript", "Redux", "Testing"],
+    matchPercentage: 80,
+    matchReason: "Good match: React Native, Redux. Missing: Native iOS/Android experience"
+  },
+  {
+    id: "6",
+    title: "Cloud Engineering Intern",
+    company: "Cloudify",
+    location: "Hyderabad, India",
+    duration: "5 months",
+    compensation: "$2,400/month",
+    description: "Assist in deploying and managing cloud infrastructure on AWS and Azure. Automate CI/CD pipelines.",
+    skills: ["AWS", "Azure", "CI/CD", "Terraform"],
+    matchPercentage: 75,
+    matchReason: "Decent match: AWS, CI/CD. Missing: Azure, Terraform experience"
+  },
+  {
+    id: "7",
+    title: "Product Management Intern",
+    company: "InnovateNow",
+    location: "Delhi, India",
+    duration: "3 months",
+    compensation: "$1,900/month",
+    description: "Support product managers in market research, user interviews, and feature prioritization.",
+    skills: ["Market Research", "User Interviews", "Agile", "Roadmapping"],
+    matchPercentage: 70,
+    matchReason: "Decent match: Market Research, Agile. Missing: Roadmapping experience"
   }
 ];
 
@@ -78,17 +126,13 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 100;
     const direction = info.offset.x > threshold ? "right" : info.offset.x < -threshold ? "left" : null;
-    
     if (direction) {
-      // Animate card off screen
       x.set(direction === "right" ? 300 : -300);
-      
       setTimeout(() => {
-        setCurrentIndex(prev => prev + 1);
+        setCurrentIndex(prev => (prev + 1) % jobs.length);
         x.set(0);
       }, 200);
     } else {
-      // Snap back to center
       x.set(0);
     }
   };
@@ -96,7 +140,7 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
   const handleSwipe = (direction: "left" | "right") => {
     x.set(direction === "right" ? 300 : -300);
     setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex(prev => (prev + 1) % jobs.length);
       x.set(0);
     }, 200);
   };
@@ -117,36 +161,20 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  if (currentIndex >= jobs.length) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center space-y-6"
-        >
-          <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
-            <Heart className="h-8 w-8 text-accent" />
-          </div>
-          <h2 className="text-hero">All done!</h2>
-          <p className="text-body text-muted-foreground max-w-md">
-            You've reviewed all available opportunities. Check back later for new matches!
-          </p>
-          <Button onClick={onBack} className="btn-hero">
-            Back to Dashboard
-          </Button>
-        </motion.div>
-      </div>
-    );
-  }
+  // Remove end-of-cards message, cards now loop
 
-  if (!currentJob) return null;
+  // Remove blank page bug: don't return null if currentJob is undefined
 
   return (
     <div className="min-h-screen bg-background flex flex-row">
       {/* Dashboard Sidebar - always visible on the left */}
       <aside className="w-80 h-full bg-card border-r border-border p-6 flex flex-col gap-8">
-  <h2 className="font-semibold text-lg mb-6">Dashboard</h2>
+        <div className="flex items-center gap-3 mb-6">
+          <Button variant="ghost" onClick={onBack} className="p-2 h-8 w-8">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="font-semibold text-lg">Dashboard</h2>
+        </div>
         {/* Resume Section */}
         <section>
           <h3 className="font-medium mb-2 flex items-center gap-2"><FileText className="h-5 w-5 text-muted-foreground" /> Resume</h3>
@@ -181,19 +209,9 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
           </ul>
         </section>
       </aside>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <Button variant="ghost" onClick={onBack} className="p-2">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="font-medium">Find Opportunities</h1>
-        <div className="text-caption text-muted-foreground">
-          {currentIndex + 1} / {jobs.length}
-        </div>
-      </div>
 
       {/* Swipe Area */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 relative overflow-hidden">
+  <div className="flex-1 flex items-center justify-center py-8 relative overflow-hidden">
         <div className="relative w-full max-w-sm">
           {/* Current Card */}
           <motion.div
@@ -209,14 +227,6 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
               <div className="match-badge">
                 {currentJob.matchPercentage}% match
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowJobDetail(true)}
-                className="p-2"
-              >
-                <Info className="h-4 w-4" />
-              </Button>
             </div>
 
             {/* Job Info */}
@@ -264,6 +274,39 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
                 </p>
               </div>
             </div>
+
+            {/* Action Buttons - now below the swipe card */}
+            <div className="p-4 border-t border-border mt-6">
+              <div className="flex justify-center space-x-6">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => handleSwipe("left")}
+                  className="w-16 h-16 rounded-full border-destructive/30 hover:bg-destructive/10 focus-ring"
+                >
+                  <X className="h-6 w-6 text-destructive" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setShowJobDetail(true)}
+                  className="w-16 h-16 rounded-full focus-ring"
+                >
+                  <Info className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => handleSwipe("right")}
+                  className="w-16 h-16 rounded-full border-green-500/30 hover:bg-green-500/10 focus-ring"
+                >
+                  <Heart className="h-6 w-6 text-green-500" />
+                </Button>
+              </div>
+              <p className="text-small text-muted-foreground text-center mt-4">
+                Use arrow keys or swipe to navigate • Space for details
+              </p>
+            </div>
           </motion.div>
 
           {/* Next Card Preview */}
@@ -293,42 +336,6 @@ const SwipeView = ({ onBack }: SwipeViewProps) => {
             <Heart className="h-8 w-8 text-green-500" />
           </motion.div>
         </div>
-      </div>
-
-      {/* Action Buttons - now below the swipe area */}
-      <div className="p-4 border-t border-border">
-        <div className="flex justify-center space-x-6">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => handleSwipe("left")}
-            className="w-16 h-16 rounded-full border-destructive/30 hover:bg-destructive/10 focus-ring"
-          >
-            <X className="h-6 w-6 text-destructive" />
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => setShowJobDetail(true)}
-            className="w-16 h-16 rounded-full focus-ring"
-          >
-            <Info className="h-6 w-6" />
-          </Button>
-
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => handleSwipe("right")}
-            className="w-16 h-16 rounded-full border-green-500/30 hover:bg-green-500/10 focus-ring"
-          >
-            <Heart className="h-6 w-6 text-green-500" />
-          </Button>
-        </div>
-        
-        <p className="text-small text-muted-foreground text-center mt-4">
-          Use arrow keys or swipe to navigate • Space for details
-        </p>
       </div>
     </div>
   );
