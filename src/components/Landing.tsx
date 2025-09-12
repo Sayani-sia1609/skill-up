@@ -72,9 +72,8 @@ const Landing = ({ onGetStarted }: LandingProps) => {
           </div>
           {/* Right: Banner Image Placeholder */}
           <div className="flex-1 flex items-center justify-end mt-8 md:mt-0">
-            <div className="h-56 w-72 bg-blue-400/30 rounded-2xl flex items-center justify-center">
-              {/* Replace with actual image if needed */}
-              <span className="text-white text-lg font-semibold">Banner Image</span>
+            <div className="h-56 w-72 rounded-2xl flex items-center justify-center overflow-hidden bg-blue-400/30">
+              <img src="/logo.jpg" alt="Banner" className="object-cover w-full h-full" />
             </div>
           </div>
         </div>
