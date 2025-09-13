@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { UserProfile } from "../types/user";
 import { Sun, Moon } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +15,7 @@ type UserRole = "student" | "employer" | null;
 const App = () => {
   const [currentView, setCurrentView] = useState<AppState>("landing");
   const [userRole, setUserRole] = useState<UserRole>(null);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") === "dark";
@@ -36,8 +38,9 @@ const App = () => {
     setCurrentView("auth");
   };
 
-  const handleAuthComplete = (role: "student" | "employer") => {
+  const handleAuthComplete = (role: "student" | "employer", user?: UserProfile) => {
     setUserRole(role);
+    if (user) setCurrentUser(user);
     if (role === "student") {
       setCurrentView("student-dashboard");
     } else {
@@ -67,11 +70,11 @@ const App = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-background${darkMode ? ' dark' : ''}`}> 
+    <div className={`min-h-screen bg-background`}> 
       <div>
         <AnimatePresence mode="wait">
           {currentView === "landing" && (
-            <motion.div
+              <motion.div
               key="landing"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -103,6 +106,7 @@ const App = () => {
               transition={{ duration: 0.3 }}
             >
               <StudentDashboard 
+                initialStudentInfo={currentUser}
                 onNavigateToSwipe={handleNavigateToSwipe}
                 onLogout={handleLogout}
                 darkMode={darkMode}
@@ -119,7 +123,12 @@ const App = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <EmployerDashboard onLogout={handleLogout} darkMode={darkMode} setDarkMode={setDarkMode} />
+              <EmployerDashboard 
+                initialEmployerInfo={currentUser}
+                onLogout={handleLogout} 
+                darkMode={darkMode} 
+                setDarkMode={setDarkMode} 
+              />
             </motion.div>
           )}
 

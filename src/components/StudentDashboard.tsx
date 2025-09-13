@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { UserProfile } from "../types/user";
 import StudentInfoForm from "./StudentInfoForm";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -10,19 +11,29 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
 interface StudentDashboardProps {
+  initialStudentInfo?: UserProfile | null;
   onNavigateToSwipe: () => void;
   onLogout: () => void;
   darkMode: boolean;
   setDarkMode: (val: boolean) => void;
 }
 
-const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }: StudentDashboardProps) => {
-  const navigate = typeof useNavigate === 'function' ? useNavigate() : null;
+const StudentDashboard = ({ initialStudentInfo = null, onNavigateToSwipe, onLogout, darkMode, setDarkMode }: StudentDashboardProps) => {
+  const navigate = useNavigate();
   // Student info state
-  const [studentInfo, setStudentInfo] = useState(null);
-  const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Alex+Johnson&background=06B6D4&color=fff");
+  const [studentInfo, setStudentInfo] = useState<UserProfile | Partial<UserProfile> | null>(initialStudentInfo);
+
+  // When the StudentInfoForm submits, merge the returned fields into studentInfo
+  const handleStudentInfoSubmit = (info: Partial<UserProfile>) => {
+    setStudentInfo((prev) => ({ ...(prev || {}), ...info }));
+  };
+  const [avatar, setAvatar] = useState<string | null>(null);
   // Helper to check if avatar is default
-  const isDefaultAvatar = avatar === "https://ui-avatars.com/api/?name=Alex+Johnson&background=06B6D4&color=fff";
+  const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    (studentInfo?.name || 'Alex Johnson')
+  )}&background=06B6D4&color=fff`;
+  const currentAvatar = avatar || defaultAvatarUrl;
+  const isDefaultAvatar = currentAvatar === defaultAvatarUrl;
   // Handler for back button
   const handleBack = () => {
     if (typeof onLogout === 'function') {
@@ -35,13 +46,12 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
   };
   const [profileComplete, setProfileComplete] = useState(75);
   const [hasResume, setHasResume] = useState(false);
-  // My skills (shorter list)
-  const mySkills = [
-    "Python",
-    "React",
-    "UI/UX Design",
-    "SQL"
-  ];
+  
+  // Parse skills from studentInfo.skills (comma-separated string) or fallback to defaults
+  const mySkills = studentInfo?.skills 
+    ? studentInfo.skills.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0)
+    : ["Python", "React", "UI/UX Design", "SQL"];
+    
   // In-demand market skills
   const inDemandSkills = [
     "TypeScript",
@@ -130,9 +140,10 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
     setExperiences(experiences.filter((_, i) => i !== idx));
   };
 
-  // Show info form if not filled
-  if (!studentInfo) {
-    return <StudentInfoForm onSubmit={setStudentInfo} />;
+  // Show info form if detailed student info is not filled
+  if (!studentInfo || !studentInfo.institute || !studentInfo.educationLevel) {
+    // Show the form if we don't have the detailed student profile info (institute, education level, etc.)
+    return <StudentInfoForm onSubmit={handleStudentInfoSubmit} />;
   }
 
   return (
@@ -208,7 +219,7 @@ const StudentDashboard = ({ onNavigateToSwipe, onLogout, darkMode, setDarkMode }
           animate={{ opacity: 1, y: 0 }}
           className="space-y-2"
         >
-          <h2 className="text-hero">Welcome back, Alex!</h2>
+          <h2 className="text-hero">Welcome back, {user.name}!</h2>
           <p className="text-body text-muted-foreground">
             Ready to find your next opportunity?
           </p>

@@ -4,12 +4,11 @@ import { Button } from "@/components/ui/button";
 
 interface LandingProps {
   onGetStarted: () => void;
+  darkMode: boolean;
+  setDarkMode: (val: boolean) => void;
 }
 
-// If you have a theme context, import and use it. Otherwise, pass darkMode/setDarkMode as props or remove.
-const darkMode = false;
-const setDarkMode = () => {};
-const Landing = ({ onGetStarted }: LandingProps) => {
+const Landing = ({ onGetStarted, darkMode, setDarkMode }: LandingProps) => {
   // Mock internship count
   const openInternships = 12;
 
@@ -25,16 +24,16 @@ const Landing = ({ onGetStarted }: LandingProps) => {
           </div>
           {/* Buttons */}
           <div className="flex items-center gap-3">
-            {/* Login Button */}
-            <Button variant="outline" className="border-border text-foreground" onClick={onGetStarted}>Login</Button>
-            {/* Signup Button */}
-            <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white" onClick={onGetStarted}>Sign Up</Button>
+            {/* Join Now Button */}
+            <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold px-6 py-2 shadow-md hover:bg-gray-100" onClick={onGetStarted}>
+              Join Now
+            </Button>
             {/* Dark/Light Mode Toggle */}
             <Button
               variant="ghost"
               size="icon"
               aria-label="Toggle theme"
-              onClick={setDarkMode}
+              onClick={() => setDarkMode(!darkMode)}
               className="text-foreground"
             >
               {darkMode ? (
@@ -181,20 +180,14 @@ const Landing = ({ onGetStarted }: LandingProps) => {
           >
             <h1
               className={
-                `text-4xl md:text-5xl font-extrabold tracking-tight mb-6 ` +
-                (darkMode
-                  ? 'text-blue-200'
-                  : 'text-blue-900 drop-shadow-lg')
+                "text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-blue-900 dark:text-blue-200 dark:drop-shadow-none drop-shadow-lg"
               }
             >
               AI-powered internship matching that actually works
             </h1>
             <p
               className={
-                `text-lg md:text-xl max-w-lg mx-auto mb-2 font-semibold ` +
-                (darkMode
-                  ? 'text-blue-300'
-                  : 'text-blue-700')
+                "text-lg md:text-xl max-w-lg mx-auto mb-2 font-semibold text-blue-700 dark:text-blue-300"
               }
             >
               Skill up. Discover, match, and grow with internships tailored to your strengths.

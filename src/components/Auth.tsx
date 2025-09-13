@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { UserProfile } from "../types/user";
 import { motion } from "framer-motion";
 import { User, Building, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ type UserRole = "student" | "employer" | null;
 
 interface AuthProps {
   onBack: () => void;
-  onAuthComplete: (role: "student" | "employer", studentInfo?: any) => void;
+  onAuthComplete: (role: "student" | "employer", studentInfo?: UserProfile) => void;
 }
 
 const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
@@ -22,7 +23,8 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     password: "",
     confirmPassword: "",
     name: "",
-    company: ""
+    company: "",
+    contactNumber: ""
   });
 
   const handleRoleSelect = (role: UserRole) => {
@@ -35,7 +37,20 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
     console.log("Auth attempt:", { role: selectedRole, ...formData });
     // Simulate successful auth
     if (selectedRole) {
-      onAuthComplete(selectedRole);
+      if (isSignUp) {
+        // pass created user info upward so dashboard can show name/email immediately
+        const newUser = {
+          name: formData.name,
+          email: formData.email,
+          ...(selectedRole === "employer" && { 
+            company: formData.company,
+            contactNumber: formData.contactNumber 
+          }),
+        };
+        onAuthComplete(selectedRole, newUser);
+      } else {
+        onAuthComplete(selectedRole);
+      }
     }
   };
 
@@ -157,17 +172,31 @@ const Auth = ({ onBack, onAuthComplete }: AuthProps) => {
             )}
 
             {isSignUp && selectedRole === "employer" && (
-              <div>
-                <Label htmlFor="company" className="text-white">Company Name</Label>
-                <Input
-                  id="company"
-                  type="text"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  required
-                  className="focus-ring"
-                />
-              </div>
+              <>
+                <div>
+                  <Label htmlFor="company" className="text-white">Company Name</Label>
+                  <Input
+                    id="company"
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    required
+                    className="focus-ring"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="contactNumber" className="text-white">Contact Number</Label>
+                  <Input
+                    id="contactNumber"
+                    type="tel"
+                    value={formData.contactNumber}
+                    onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
+                    required
+                    className="focus-ring"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </>
             )}
 
             <div>
